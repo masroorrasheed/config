@@ -1,0 +1,173 @@
+"################################################################################
+" File Name : vimrc
+" Author : Masroor Rasheed
+" Created : 19th Feb 2021
+"################################################################################
+set	nocompatible
+
+if empty(glob('~/.config/vim/autoload/plug.vim'))
+	silent !curl -fLo ~/.config/vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.config/vim/pluggged')
+
+Plug 'morhetz/gruvbox'
+
+call plug#end()
+
+syntax enable
+filetype plugin indent on
+colorscheme gruvbox
+set	background=dark
+
+" Search down into subfolders
+" Provides tab-completion for all file-related tasks
+set	path+=.,**
+set	fileformat=unix
+set	fileencoding=utf-8 nobomb
+set noswapfile
+set nowrap
+set noswapfile
+set nobackup
+set undodir=/tmp/
+set undofile
+
+" Display all matching files when we tab completion
+set	wildmenu
+set	wildmode=list:full
+let	mapleader=" "
+
+
+" Editting Options "
+set	nu rnu
+set	laststatus=2
+set	clipboard=unnamed
+set	mouse=nicra
+set	ttyfast
+set	ruler
+set	scrolloff=5
+set	showmode
+set	showcmd
+set	title
+set	hlsearch
+set	incsearch
+set laststatus=2
+set mouse=a
+set modelines=2
+
+" Corrections and Help"
+setlocal spell spelllang=en_gb
+set	spell
+set	complete+=kspell
+set completeopt=menuone,longest
+set shortmess+=c
+set showmatch
+
+" Formatting Options
+set formatoptions=tcqrn1
+set autoread
+set autoindent
+set colorcolumn=80
+set smartcase
+set	smartindent
+set	showmatch
+set	smarttab
+set	shiftwidth=4
+set	tabstop=4
+set	foldmethod=indent
+set	foldlevel=99
+
+" Status line
+set	statusline=
+set	statusline+=%#DiffChange#
+set	statusline+=\ %M	" Any changes to file mode
+set	statusline+=\ %y
+set	statusline+=\ %r
+set	statusline+=%#DiffAdd#
+set	statusline+=\ %F	" Full filename with path
+set	statusline+=%=		" Right Side of the Bar
+set	statusline+=%#TermCursor#
+set	statusline+=\ %c:(%l/%L)
+set	statusline+=\ %p%%
+set	statusline+=%#Conceal#
+set	statusline+=\ [%n]
+
+" Window Mangement 
+set	splitbelow splitright
+nnoremap	<C-J>	<C-W><C-J>
+nnoremap	<C-K>	<C-W><C-K>
+nnoremap	<C-L>	<C-W><C-L>
+nnoremap	<C-H>	<C-W><C-H>
+
+nnoremap	<silent>	<C-Left>	:vertical resize +3<CR>
+nnoremap	<silent>	<C-Right>	:vertical resize -3<CR>
+nnoremap	<silent>	<C-Up>	:resize +3<CR>
+nnoremap	<silent>	<C-Down>	:resize -3<CR>
+
+map	<Leader>th			<C-w>t<C-w>H
+map	<Leader>tk			<C-w>t<C-w>K
+
+" Cursor based on Mode
+let &t_SI.="\e[5 q"		" INSERT MODE
+let &t_SR.="\e[3 q"		" REPLACE MODE
+let &t_EI.="\e[1 q"		" NORMAL MODE
+
+" Auto Close brackets and qutoation
+inoremap " ""<left>
+inoremap ' ''<left>
+inoremap ( ()<left>
+inoremap [ []<left>
+inoremap { {}<left>
+inoremap {<CR> {<CR>}<ESC>O
+inoremap {;<CR> {<CR>};<ESC>O
+
+
+let s:comment_map = {
+    \   "c": '\/\/',
+    \   "cpp": '\/\/',
+    \   "go": '\/\/',
+    \   "java": '\/\/',
+    \   "javascript": '\/\/',
+    \   "lua": '--',
+    \   "scala": '\/\/',
+    \   "php": '\/\/',
+    \   "python": '#',
+    \   "ruby": '#',
+    \   "rust": '\/\/',
+    \   "sh": '#',
+    \   "desktop": '#',
+    \   "fstab": '#',
+    \   "conf": '#',
+    \   "profile": '#',
+    \   "bashrc": '#',
+    \   "bash_profile": '#',
+    \   "mail": '>',
+    \   "eml": '>',
+    \   "bat": 'REM',
+    \   "ahk": ';',
+    \   "vim": '"',
+    \   "tex": '%',
+    \   "sql": '--',
+    \ }
+
+function! ToggleComment()
+    if has_key(s:comment_map, &filetype)
+        let comment_leader = s:comment_map[&filetype]
+        if getline('.') =~ "^\\s*" . comment_leader . " " " Uncomment the line
+            execute "silent s/^\\(\\s*\\)" . comment_leader . " /\\1/"
+        else
+            if getline('.') =~ "^\\s*" . comment_leader " Uncomment the line
+                execute "silent s/^\\(\\s*\\)" . comment_leader . "/\\1/"
+            else " Comment the line
+                execute "silent s/^\\(\\s*\\)/\\1" . comment_leader . " /"
+            end
+        end
+    else
+        echo "No comment leader found for filetype"
+    end
+endfunction
+
+
+nnoremap <leader>c :call ToggleComment()<cr>
+vnoremap <leader>c :call ToggleComment()<cr>
